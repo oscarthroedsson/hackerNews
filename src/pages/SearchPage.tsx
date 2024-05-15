@@ -71,6 +71,7 @@ const SearchPage = () => {
   };
 
   function updateView(newSearchResult: HN_SearchResponse) {
+    setIsLoading(false);
     setSearchResult(newSearchResult);
   }
 

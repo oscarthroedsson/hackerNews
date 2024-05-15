@@ -11,7 +11,7 @@ interface PaginationControllerProps {
 }
 
 export default function Pagination({ searchResult, searchInput, maxPages, updateView }: PaginationControllerProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, setIsPending] = useState(false);
 
   //? Wtf, är  detta bra TS?!
   if (!searchResult) return;
@@ -25,10 +25,10 @@ export default function Pagination({ searchResult, searchInput, maxPages, update
       return;
     }
 
-    setIsLoading(true);
+    setIsPending(true);
     const newPage = await search(searchInput, searchResult.page - 1);
     updateView(newPage);
-    setIsLoading(false);
+    setIsPending(false);
   }
 
   async function paginationPlusOne() {
@@ -36,16 +36,16 @@ export default function Pagination({ searchResult, searchInput, maxPages, update
       return;
     }
 
-    setIsLoading(true);
+    setIsPending(true);
     const newPage = await search(searchInput, searchResult.page + 1);
     updateView(newPage);
-    setIsLoading(false);
+    setIsPending(false);
   }
 
   return (
     <div className="d-flex justify-content-between align-items-center">
       <div className="prev">
-        <Button variant="primary" onClick={paginationMinusOne} disabled={isLoading || searchResult.page + 1 === 1}>
+        <Button variant="primary" onClick={paginationMinusOne} disabled={isPending || searchResult.page + 1 === 1}>
           Previous Page
         </Button>
       </div>
@@ -58,7 +58,7 @@ export default function Pagination({ searchResult, searchInput, maxPages, update
         <Button
           variant="primary"
           onClick={paginationPlusOne}
-          disabled={isLoading || searchResult.page + 1 === maxPages.current}
+          disabled={isPending || searchResult.page + 1 === maxPages.current}
         >
           Next Page
         </Button>
