@@ -1,25 +1,19 @@
-import { useState } from "react";
+import { useState, RefObject } from "react";
 import { search } from "../services/HackerNewsAPI";
 import { Button } from "react-bootstrap";
 import { HN_SearchResponse } from "../services/HackerNewsAPI.types";
-
-import { RefObject } from "react";
 
 interface PaginationControllerProps {
   searchResult: HN_SearchResponse | null;
   searchInput: string;
   maxPages: RefObject<number>;
-  callback: (newPage: HN_SearchResponse) => void;
+  updateView: (newPage: HN_SearchResponse) => void;
 }
 
-export default function PaginationController({
-  searchResult,
-  searchInput,
-  maxPages,
-  callback,
-}: PaginationControllerProps) {
+export default function Pagination({ searchResult, searchInput, maxPages, updateView }: PaginationControllerProps) {
   const [isLoading, setIsLoading] = useState(false);
 
+  //? Wtf, är  detta bra TS?!
   if (!searchResult) return;
   if (searchResult.page === null) return;
   if (!searchInput) return;
@@ -27,23 +21,24 @@ export default function PaginationController({
 
   async function paginationMinusOne() {
     if (!searchResult || searchResult.page <= 0) {
+      console.log("paginationMinusOne | if var sann");
       return;
     }
 
     setIsLoading(true);
-    const newPage = await search(searchInput, searchResult.page + 1);
-    callback(newPage);
+    const newPage = await search(searchInput, searchResult.page - 1);
+    updateView(newPage);
     setIsLoading(false);
   }
 
   async function paginationPlusOne() {
-    if (!searchResult || searchResult.page <= 0) {
+    if (!searchResult || searchResult.page === maxPages.current) {
       return;
     }
 
     setIsLoading(true);
     const newPage = await search(searchInput, searchResult.page + 1);
-    callback(newPage);
+    updateView(newPage);
     setIsLoading(false);
   }
 
@@ -55,7 +50,9 @@ export default function PaginationController({
         </Button>
       </div>
 
-      <div className="page">{searchResult && searchResult.page + 1}</div>
+      <div className="page">
+        {searchResult && searchResult.page + 1} / {maxPages.current}
+      </div>
 
       <div className="next">
         <Button

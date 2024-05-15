@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form";
 import ListGroup from "react-bootstrap/ListGroup";
 import { searchByDate as HN_searchByDate } from "../services/HackerNewsAPI";
 import { HN_SearchResponse } from "../services/HackerNewsAPI.types";
-import PaginationController from "../components/PaginationController";
+import Pagination from "../components/Pagination";
 
 const SearchPage = () => {
   const [error, setError] = useState<string | false>(false);
@@ -34,12 +34,11 @@ const SearchPage = () => {
     // get search results from API
     try {
       const data = await HN_searchByDate(searchQuery);
-
+      console.log("data: ", data);
       if (data.nbPages) {
         maxPages.current = data.nbPages;
       }
 
-      console.log("data: ", data);
       // update state with search results
       setSearchResult(data);
     } catch (err) {
@@ -71,7 +70,7 @@ const SearchPage = () => {
     searchHackerNews(trimmedSearchInput);
   };
 
-  function changePage(newSearchResult: HN_SearchResponse) {
+  function updateView(newSearchResult: HN_SearchResponse) {
     setSearchResult(newSearchResult);
   }
 
@@ -121,11 +120,11 @@ const SearchPage = () => {
               ))}
             </ListGroup>
           )}
-          <PaginationController
+          <Pagination
             searchResult={searchResult}
             searchInput={searchInput}
             maxPages={maxPages}
-            callback={changePage}
+            updateView={updateView}
           />
         </div>
       )}
